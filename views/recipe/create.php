@@ -32,6 +32,8 @@
     <input type="submit" value="Dodaj">
 </form>
 
+<a href="index.php?action=myRecipes">Powrót</a>
+
 <script>
 
     var ingredientsCount = 1;

@@ -15,33 +15,10 @@
     $recipeController = new RecipeController();
 
     $action = isset($_GET['action']) ? $_GET['action'] : 'index';
+    $logged = isset($_SESSION['user']);
+    $method = $_SERVER['REQUEST_METHOD'];
 
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        if ($action === 'login') {
-            $userController->getLoginPage();
-        } elseif ($action === 'register') {
-            $userController->getRegisterPage();
-        }
-    } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if ($action === 'login') {
-            $userController->login($_POST['username'], $_POST['password']);
-        } elseif ($action === 'register') {
-            $userController->register($_POST['username'], $_POST['password']);
-        }
-    }
-    
-    /*if(!isset($_SESSION['user']))
-    {
-        if($action == 'register')
-        {
-            $userController->getRegisterPage();
-        }
-        else
-        {
-            $userController->getLoginPage();
-        }
-    }
-    else*/ if(isset($_SESSION['user']))
+    if($logged)
     {
         switch($action)
         {
@@ -68,6 +45,35 @@
                 break;
             default:
                 $recipeController->getAllRecipes();
+                break;
+        }
+    }
+    else
+    {
+        switch($action)
+        {
+            case 'login':
+                if($method === 'GET')
+                {
+                    $userController->getLoginPage();
+                }
+                elseif($method === 'POST')
+                {
+                    $userController->login($_POST['username'], $_POST['password']);
+                }
+                break;
+            case 'register':
+                if($method === 'GET')
+                {
+                    $userController->getRegisterPage();
+                }
+                elseif($method === 'POST')
+                {
+                    $userController->register($_POST['username'], $_POST['password']);
+                }
+                break;
+            default:
+                $userController->getLoginPage();
                 break;
         }
     }

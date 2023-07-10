@@ -48,7 +48,12 @@
         public static function getUserByUsername($username)
         {
             global $db;
-            $result = $db->query("SELECT * FROM users WHERE username='$username'");
+            $username = filter_var($username, FILTER_SANITIZE_STRING);
+            $sql = $db->prepare("SELECT * FROM users WHERE username = ?");
+            $sql->bind_param("s", $username);
+            $sql->execute();
+            $result = $sql->get_result();
+            //$result = $db->query("SELECT * FROM users WHERE username='$username'");
             if(mysqli_num_rows($result))
             {
                 $result = $result->fetch_assoc();
