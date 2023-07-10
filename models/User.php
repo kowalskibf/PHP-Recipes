@@ -65,7 +65,13 @@
         public static function isUsernameAvailable($username)
         {
             global $db;
-            return $db->query("SELECT * FROM users WHERE username='$username'")->num_rows > 0 ? false : true;
+            $username = filter_var($username, FILTER_SANITIZE_STRING);
+            $sql = $db->prepare("SELECT * FROM users WHERE username = ?");
+            $sql->bind_param("s", $username);
+            $sql->execute();
+            $result = $sql->get_result();
+            return $result->num_rows > 0 ? false : true;
+            //return $db->query("SELECT * FROM users WHERE username='$username'")->num_rows > 0 ? false : true;
         }
 
         public function register()
@@ -75,7 +81,12 @@
                 global $db;
                 $username = $this->username;
                 $password = $this->password;
-                $db->query("INSERT INTO users VALUES (NULL, '$username', '$password')");
+                $username = filter_var($username, FILTER_SANITIZE_STRING);
+                $password = filter_var($password, FILTER_SANITIZE_STRING);
+                $sql = $db->prepare("INSERT INTO users VALUES (NULL, ?, ?)");
+                $sql->bind_param("ss", $username, $password);
+                $sql->execute();
+                //$db->query("INSERT INTO users VALUES (NULL, '$username', '$password')");
             }
         }
 
