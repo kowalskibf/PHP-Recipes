@@ -59,16 +59,16 @@
         public static function getStepsByRecipeId($recipeId)
         {
             global $db;
-            $results = $db->query("SELECT * FROM steps WHERE recipeid='$recipeId'");
-            $result_arr = array();
+            //$results = $db->query("SELECT * FROM steps WHERE recipeid='$recipeId'");
+            $recipeId = filter_var($recipeId, FILTER_SANITIZE_STRING);
+            $sql = $db->prepare("SELECT * FROM steps WHERE recipeid = ?");
+            $sql->bind_param("i", $recipeId);
+            $sql->execute();
+            $results = $sql->get_result();
+            $steps = array();
             while($result = mysqli_fetch_assoc($results))
             {
-                array_push($result_arr, $result);
-            }
-            $steps = array();
-            foreach($result_arr as $res)
-            {
-                $new_step = new Step($res['id'], $res['recipeid'], $res['number'], $res['description']);
+                $new_step = new Step($result['id'], $result['recipeid'], $result['number'], $result['description']);
                 array_push($steps, $new_step);
             }
             return $steps;
@@ -89,7 +89,11 @@
         public static function deleteStepByRecipeId($recipeId)
         {
             global $db;
-            $db->query("DELETE FROM steps WHERE recipeid='$recipeId'");
+            $recipeId = filter_var($recipeId, FILTER_SANITIZE_STRING);
+            $sql = $db->prepare("DELETE FROM steps WHERE recipeid = ?");
+            $sql->bind_param("i", $recipeId);
+            $sql->execute();
+            //$db->query("DELETE FROM steps WHERE recipeid='$recipeId'");
         }
 
         public static function updateStepsByRecipeId($recipeId, $data)
