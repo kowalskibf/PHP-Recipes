@@ -46,7 +46,12 @@
         public static function getIngredientById($id)
         {
             global $db;
-            $result = $db->query("SELECT * FROM ingredients WHERE id='$id'")->fetch_assoc();
+            $id = filter_var($id, FILTER_SANITIZE_STRING);
+            $sql = $db->prepare("SELECT * FROM ingredients WHERE id = ?");
+            $sql->bind_param("i", $id);
+            $sql->execute();
+            $result = $sql->get_result();
+            //$result = $db->query("SELECT * FROM ingredients WHERE id='$id'")->fetch_assoc();
             $ingredient = new Ingredient($result['id'], $result['recipeid'], $result['description']);
             return $ingredient;
         }
@@ -55,7 +60,12 @@
         {
             global $db;
             $ingredients = array();
-            $results = $db->query("SELECT * FROM ingredients WHERE recipeid='$recipeId'");
+            $recipeId = filter_var($recipeId, FILTER_SANITIZE_STRING);
+            $sql = $db->prepare("SELECT * FROM ingredients WHERE recipeid = ?");
+            $sql->bind_param("i", $recipeId);
+            $sql->execute();
+            $results = $sql->get_result();
+            //$results = $db->query("SELECT * FROM ingredients WHERE recipeid='$recipeId'");
             while($result = mysqli_fetch_assoc($results))
             {
                 $new_ingredient = new Ingredient($result['id'], $result['recipeid'], $result['description']);
@@ -78,7 +88,11 @@
         public static function deleteIngredientByRecipeId($recipeId)
         {
             global $db;
-            $db->query("DELETE FROM ingredints WHERE recipeid='$recipeId'");
+            $recipeId = filter_var($recipeId, FILTER_SANITIZE_STRING);
+            $sql = $db->prepare("DELETE FROM ingredients WHERE recipeid = ?");
+            $sql->bind_param("i", $recipeId);
+            $sql->execute();
+            //$db->query("DELETE FROM ingredints WHERE recipeid='$recipeId'");
         }
 
         public static function updateIngredientsByRecipeId($recipeId, $data)
