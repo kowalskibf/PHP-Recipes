@@ -117,7 +117,11 @@
         {
             $userId = $_SESSION['user']->getId();
             global $db;
-            $result = $db->query("SELECT * FROM recipes WHERE id='$id' AND userid='$userId'")->fetch_assoc();
+            $sql = $db->prepare("SELECT * FROM recipes WHERE id = ? AND userid = ?");
+            $sql->bind_param("ii", $id, $userId);
+            $sql->execute();
+            $result = $sql->get_result()->fetch_assoc();
+            //$result = $db->query("SELECT * FROM recipes WHERE id='$id' AND userid='$userId'")->fetch_assoc();
             $ingredients = Ingredient::getIngredientsByRecipeId($id);
             $steps = Step::getStepsByRecipeId($id);
             $recipe = new Recipe($result['id'], $userId, $result['title'], $result['description'], $result['public'], $ingredients, $steps);
@@ -154,10 +158,21 @@
         {
             $userId = $_SESSION['user']->getId();
             global $db;
-            if(mysqli_num_rows($db->query("SELECT * FROM recipes WHERE id='$id' AND userid='$userId'")))
+            $id = filter_var($id, FILTER_SANITIZE_STRING);
+            $sql = $db->prepare("SELECT * FROM recipes WHERE id = ? AND userid = ?");
+            $sql->bind_param("ii", $id, $userId);
+            $sql->execute();
+            if($sql->get_result()->num_rows)
+            //if(mysqli_num_rows($db->query("SELECT * FROM recipes WHERE id='$id' AND userid='$userId'")))
             {
-                $db->query("DELETE FROM recipes WHERE id='$id' AND userid='$userId'");
-                $db->query("DELETE FROM favorites WHERE recipeid='$id'");
+                //$db->query("DELETE FROM recipes WHERE id='$id' AND userid='$userId'");
+                $sql = $db->prepare("DELETE FROM recipes WHERE id = ? AND userid = ?");
+                $sql->bind_param("ii", $id, $userId);
+                $sql->execute();
+                //$db->query("DELETE FROM favorites WHERE recipeid='$id'");
+                $sql = $db->prepare("DELETE FROM favorites WHERE recipeid = ?");
+                $sql->bind_param("i", $id);
+                $sql->execute();
                 Ingredient::deleteIngredientByRecipeId($id);
                 Step::deleteStepByRecipeId($id);
             }
@@ -210,26 +225,15 @@
             return $recipes;
         }
 
-        public static function getFilteredPublicRecipes($ingredients)
-        {
-            global $db;
-            $recipes = array();
-            $results = $db->query("SELECT * FROM recipes WHERE public=1");
-            while($result = mysqli_fetch_assoc($results))
-            {
-                $recipeId = $result['id'];
-                $ingredients = Ingredient::getIngredientsByRecipeId(intval($recipeId));
-                $steps = Step::getStepsByRecipeId(intval($recipeId));
-                $recipe = new Recipe($recipeId, $result['userid'], $result['title'], $result['description'], $result['public'], $ingredients, $steps);
-                array_push($recipes, $recipe);
-            }
-            return $recipes;
-        }
-
         public static function getPublicRecipeById($id)
         {
             global $db;
-            $result = $db->query("SELECT * FROM recipes WHERE id='$id' AND public=1");
+            $id = filter_var($id, FILTER_SANITIZE_STRING);
+            $sql = $db->prepare("SELECT * FROM recipes WHERE id = ? AND public=1");
+            $sql->bind_param("i", $id);
+            $sql->execute();
+            $result = $sql->get_result();
+            //$result = $db->query("SELECT * FROM recipes WHERE id='$id' AND public=1");
             if($result->num_rows > 0)
             {
                 $result = $result->fetch_assoc();
@@ -244,23 +248,41 @@
         public static function getRecipeUsernameByRecipeId($recipeId)
         {
             global $db;
-            return $db->query("SELECT users.username FROM users LEFT JOIN recipes ON users.id=recipes.userid WHERE recipes.id='$recipeId'")->fetch_assoc()['username'];
+            $recipeId = filter_var($recipeId, FILTER_SANITIZE_STRING);
+            $sql = $db->prepare("SELECT users.username FROM users LEFT JOIN recipes ON users.id=recipes.userid WHERE recipes.id = ?");
+            $sql->bind_param("i", $recipeId);
+            $sql->execute();
+            return $sql->get_result()->fetch_assoc()['username'];
+            //return $db->query("SELECT users.username FROM users LEFT JOIN recipes ON users.id=recipes.userid WHERE recipes.id='$recipeId'")->fetch_assoc()['username'];
         }
 
         public function getRecipeUsername()
         {
             global $db;
             $userId = $this->getUserId();
-            return $db->query("SELECT username FROM users WHERE id='$userId'")->fetch_assoc()['username'];
+            $userId = filter_var($userId, FILTER_SANITIZE_STRING);
+            $sql = $db->prepare("SELECT username FROM users WHERE id = ?");
+            $sql->bind_param("i", $userId);
+            $sql->execute();
+            return $sql->get_result()->fetch_assoc()['username'];
+            //return $db->query("SELECT username FROM users WHERE id='$userId'")->fetch_assoc()['username'];
         }
 
         public static function addRecipeToFavorites($recipeId)
         {
             global $db;
             $userId = $_SESSION['user']->getId();
-            if(mysqli_num_rows($db->query("SELECT * FROM recipes WHERE id='$recipeId' AND public=1")))
+            $recipeId = filter_var($recipeId, FILTER_SANITIZE_STRING);
+            $sql = $db->prepare("SELECT * FROM recipes WHERE id = ? AND public=1");
+            $sql->bind_param("i", $recipeId);
+            $sql->execute();
+            if($sql->get_result()->num_rows)
+            //if(mysqli_num_rows($db->query("SELECT * FROM recipes WHERE id='$recipeId' AND public=1")))
             {
-                $db->query("INSERT INTO favorites VALUES (NULL, '$userId', '$recipeId')");
+                $sql = $db->prepare("INSERT INTO favorites VALUES (NULL, ?, ?)");
+                $sql->bind_param("ii", $userId, $recipeId);
+                $sql->execute();
+                //$db->query("INSERT INTO favorites VALUES (NULL, '$userId', '$recipeId')");
             }
         }
 
@@ -268,18 +290,27 @@
         {
             global $db;
             $userId = $_SESSION['user']->getId();
-            $db->query("DELETE FROM favorites WHERE userid='$userId' AND recipeid='$recipeId'");
+            $recipeId = filter_var($recipeId, FILTER_SANITIZE_STRING);
+            $sql = $db->prepare("DELETE FROM favorites WHERE userid = ? AND recipeid = ?");
+            $sql->bind_param("ii", $userId, $recipeId);
+            $sql->execute();
+            //$db->query("DELETE FROM favorites WHERE userid='$userId' AND recipeid='$recipeId'");
         }
 
         public static function isRecipeFavorite($recipeId)
         {
             global $db;
             $userId = $_SESSION['user']->getId();
-            if(mysqli_num_rows($db->query("SELECT * FROM favorites WHERE userid='$userId' AND recipeid='$recipeId'")))
+            $recipeId = filter_var($recipeId, FILTER_SANITIZE_STRING);
+            $sql = $db->prepare("SELECT * FROM favorites WHERE userid = ? AND recipeid = ?");
+            $sql->bind_param("ii", $userId, $recipeId);
+            $sql->execute();
+            return $sql->get_result()->num_rows ? true : false;
+            /*if(mysqli_num_rows($db->query("SELECT * FROM favorites WHERE userid='$userId' AND recipeid='$recipeId'")))
             {
                 return true;
             }
-            return false;
+            return false;*/
         }
 
         public static function getFavoriteRecipes()
@@ -287,7 +318,11 @@
             global $db;
             $userId = $_SESSION['user']->getId();
             $recipes = array();
-            $results = $db->query("SELECT recipes.* FROM recipes LEFT JOIN favorites ON recipes.id=favorites.recipeid WHERE favorites.userid='$userId'");
+            $sql = $db->prepare("SELECT recipes.* FROM recipes LEFT JOIN favorites ON recipes.id=favorites.recipeid WHERE favorites.userid = ?");
+            $sql->bind_param("i", $userId);
+            $sql->execute();
+            $results = $sql->get_result();
+            //$results = $db->query("SELECT recipes.* FROM recipes LEFT JOIN favorites ON recipes.id=favorites.recipeid WHERE favorites.userid='$userId'");
             while($result = mysqli_fetch_assoc($results))
             {
                 $recipeId = $result['id'];
