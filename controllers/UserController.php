@@ -41,7 +41,7 @@
 
         public function register($username, $password)
         {
-            if(strlen($username) > 0 && strlen($password) > 0)
+            if(strlen($username) > 0 && strlen($username) < 32 && strlen($password) > 0 && strlen($password) < 32)
             {
                 if(!User::isUsernameAvailable($username))
                 {
@@ -59,7 +59,7 @@
             }
             else
             {
-                echo 'Nazwa użytkownika oraz hasło nie mogą być puste!';
+                echo 'Długości nazwy użytkownika oraz hasła muszą mieścić się w przedziale 1 - 31 znaków!';
                 $this->getRegisterPage();
             }
         }
