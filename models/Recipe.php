@@ -276,7 +276,10 @@
             $sql = $db->prepare("SELECT * FROM recipes WHERE id = ? AND public=1");
             $sql->bind_param("i", $recipeId);
             $sql->execute();
-            if($sql->get_result()->num_rows)
+            $sql2 = $db->prepare("SELECT * FROM favorites WHERE userid = ? AND recipeid = ?");
+            $sql2->bind_param("ii", $userId, $recipeId);
+            $sql2->execute();
+            if($sql->get_result()->num_rows && !$sql2->get_result()->num_rows)
             //if(mysqli_num_rows($db->query("SELECT * FROM recipes WHERE id='$recipeId' AND public=1")))
             {
                 $sql = $db->prepare("INSERT INTO favorites VALUES (NULL, ?, ?)");
