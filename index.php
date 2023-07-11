@@ -1,3 +1,7 @@
+<head>
+  <meta charset="UTF-8">
+</head>
+
 <?php
 
     ini_set('display_errors', 1);
