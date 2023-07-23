@@ -2,21 +2,21 @@
 
 <form action="index.php?action=create" method="post">
     <label for="title">Tytuł:</label>
-    <input type="text" name="recipe[title]" id="title">
+    <input type="text" name="recipe[title]" id="title" required>
 
     <label for="description">Opis:</label>
-    <input type="text" name="recipe[description]" id="description">
+    <input type="text" name="recipe[description]" id="description" required>
     
     <p>Składniki:</p>
     <div id="ingredients-container">
-        <textarea name="recipe[ingredients][0]" id="ingredient0"></textarea>
+        <textarea name="recipe[ingredients][0]" id="ingredient0" required></textarea>
     </div>
     <button onclick="addIngredient()">Dodaj składnik</button>
     <button onclick="removeIngredient()">Usuń ostatni składnik</button>
     
     <p>Instrukcje:</p>
     <div id="steps-container">
-        <span>Krok 1.</span><textarea name="recipe[steps][0]" id="step0"></textarea>
+        <span>Krok 1.</span><textarea name="recipe[steps][0]" id="step0" required></textarea>
     </div>
     <button onclick="addStep()">Dodaj krok</button>
     <button onclick="removeStep()">Usuń ostatni krok</button>
@@ -41,7 +41,7 @@
     function addIngredient()
     {
         event.preventDefault();
-        var newIngredient = '<textarea name="recipe[ingredients][' + ingredientsCount.toString() + ']" id="ingredient' + ingredientsCount.toString() + '"></textarea>';
+        var newIngredient = '<textarea name="recipe[ingredients][' + ingredientsCount.toString() + ']" id="ingredient' + ingredientsCount.toString() + '" required></textarea>';
         document.getElementById('ingredients-container').innerHTML += newIngredient;
         ingredientsCount++;
     }
@@ -62,7 +62,7 @@
     {
         event.preventDefault();
         var newStepLabel = '<span>Krok ' + (stepsCount + 1).toString() + '.</span>';
-        var newStep = '<textarea name="recipe[steps][' + stepsCount.toString() + ']" id="step' + stepsCount.toString() + '"></textarea>';
+        var newStep = '<textarea name="recipe[steps][' + stepsCount.toString() + ']" id="step' + stepsCount.toString() + '" required></textarea>';
         document.getElementById('steps-container').innerHTML += newStepLabel
         document.getElementById('steps-container').innerHTML += newStep;
         stepsCount++;

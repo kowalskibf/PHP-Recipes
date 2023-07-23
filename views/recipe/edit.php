@@ -2,15 +2,15 @@
 
 <form action="index.php?action=edit&id=<?php echo $recipe->getId(); ?>" method="post">
     <label for="title">Tytuł:</label>
-    <input type="text" name="recipe[title]" id="title" value="<?php echo $recipe->getTitle(); ?>">
+    <input type="text" name="recipe[title]" id="title" value="<?php echo $recipe->getTitle(); ?>" required>
 
     <label for="description">Opis:</label>
-    <input type="text" name="recipe[description]" id="description" value="<?php echo $recipe->getDescription(); ?>">
+    <input type="text" name="recipe[description]" id="description" value="<?php echo $recipe->getDescription(); ?>" required>
     
     <p>Składniki:</p>
     <div id="ingredients-container">
         <?php $i = 0; foreach($recipe->getIngredients() as $ingredient) { ?>
-            <textarea name="recipe[ingredients][<?php echo $i; ?>]" id="ingredient<?php echo $i; ?>"><?php echo $ingredient->getDescription(); ?></textarea>
+            <textarea name="recipe[ingredients][<?php echo $i; ?>]" id="ingredient<?php echo $i; ?>" required><?php echo $ingredient->getDescription(); ?></textarea>
         <?php $i++; } ?>
     </div>
     <button onclick="addIngredient()">Dodaj składnik</button>
@@ -19,7 +19,7 @@
     <p>Instrukcje:</p>
     <div id="steps-container">
         <?php $i = 0; foreach($recipe->getSteps() as $step) { ?>
-            <span>Krok <?php echo $i+1; ?>.</span><textarea name="recipe[steps][<?php echo $i; ?>]" id="step<?php echo $i; ?>"><?php echo $step->getDescription(); ?></textarea>
+            <span>Krok <?php echo $i+1; ?>.</span><textarea name="recipe[steps][<?php echo $i; ?>]" id="step<?php echo $i; ?>" required><?php echo $step->getDescription(); ?></textarea>
         <?php $i++ ;} ?>
     </div>
     <button onclick="addStep()">Dodaj krok</button>
@@ -43,7 +43,7 @@
     function addIngredient()
     {
         event.preventDefault();
-        var newIngredient = '<textarea name="recipe[ingredients][' + ingredientsCount.toString() + ']" id="ingredient' + ingredientsCount.toString() + '"></textarea>';
+        var newIngredient = '<textarea name="recipe[ingredients][' + ingredientsCount.toString() + ']" id="ingredient' + ingredientsCount.toString() + '" required></textarea>';
         document.getElementById('ingredients-container').innerHTML += newIngredient;
         ingredientsCount++;
     }
@@ -64,7 +64,7 @@
     {
         event.preventDefault();
         var newStepLabel = '<span>Krok ' + (stepsCount + 1).toString() + '.</span>';
-        var newStep = '<textarea name="recipe[steps][' + stepsCount.toString() + ']" id="step' + stepsCount.toString() + '"></textarea>';
+        var newStep = '<textarea name="recipe[steps][' + stepsCount.toString() + ']" id="step' + stepsCount.toString() + '" required></textarea>';
         document.getElementById('steps-container').innerHTML += newStepLabel
         document.getElementById('steps-container').innerHTML += newStep;
         stepsCount++;
