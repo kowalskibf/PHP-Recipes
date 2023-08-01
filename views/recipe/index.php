@@ -30,7 +30,11 @@ Użytkownik: <?php echo $_SESSION['user']->getUsername(); ?> <br/>
     </tbody>
 </table>
 
-<h2>Twoje ulubione przepisy</h2>
+<a href="index.php?action=myIngredients">
+    <h2>Moje składniki</h2>
+</a>
+
+<h2>Moje ulubione przepisy</h2>
 
 <table>
     <thead>

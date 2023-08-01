@@ -34,6 +34,9 @@
 
     <br/><br/>
     <input type="submit" value="Save">
+    
+    <a href="index.php?action=myRecipes">Powrót</a>
+
 </form>
 
 <script>
@@ -43,8 +46,11 @@
     function addIngredient()
     {
         event.preventDefault();
-        var newIngredient = '<textarea name="recipe[ingredients][' + ingredientsCount.toString() + ']" id="ingredient' + ingredientsCount.toString() + '" required></textarea>';
-        document.getElementById('ingredients-container').innerHTML += newIngredient;
+        var newTextarea = document.createElement('textarea');
+        newTextarea.name = 'recipe[ingredients][' + ingredientsCount.toString() + ']';
+        newTextarea.id = 'ingredient' + ingredientsCount.toString();
+        newTextarea.required = true;
+        document.getElementById('ingredients-container').appendChild(newTextarea);
         ingredientsCount++;
     }
 
@@ -65,7 +71,7 @@
         event.preventDefault();
         var newStepLabel = '<span>Krok ' + (stepsCount + 1).toString() + '.</span>';
         var newStep = '<textarea name="recipe[steps][' + stepsCount.toString() + ']" id="step' + stepsCount.toString() + '" required></textarea>';
-        document.getElementById('steps-container').innerHTML += newStepLabel
+        document.getElementById('steps-container').innerHTML += newStepLabel;
         document.getElementById('steps-container').innerHTML += newStep;
         stepsCount++;
     }

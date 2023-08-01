@@ -8,6 +8,11 @@
     <input type="text" name="recipe[description]" id="description" required>
     
     <p>Składniki:</p>
+    <?php if(count($myIngredients) > 0) { echo 'Moje składniki - kliknij na składnik, aby dodać go do przepisu:'; } ?>
+    <?php foreach($myIngredients as $myIngredient) { ?>
+        <button id='myIng<?php echo $myIngredient->getDescription(); ?>'onclick='addMyIngredient("<?php echo $myIngredient->getDescription();?>")'><?php echo $myIngredient->getDescription(); ?></button>
+    <?php } ?>
+
     <div id="ingredients-container">
         <textarea name="recipe[ingredients][0]" id="ingredient0" required></textarea>
     </div>
@@ -41,8 +46,11 @@
     function addIngredient()
     {
         event.preventDefault();
-        var newIngredient = '<textarea name="recipe[ingredients][' + ingredientsCount.toString() + ']" id="ingredient' + ingredientsCount.toString() + '" required></textarea>';
-        document.getElementById('ingredients-container').innerHTML += newIngredient;
+        var newTextarea = document.createElement('textarea');
+        newTextarea.name = 'recipe[ingredients][' + ingredientsCount.toString() + ']';
+        newTextarea.id = 'ingredient' + ingredientsCount.toString();
+        newTextarea.required = true;
+        document.getElementById('ingredients-container').appendChild(newTextarea);
         ingredientsCount++;
     }
 
@@ -63,7 +71,7 @@
         event.preventDefault();
         var newStepLabel = '<span>Krok ' + (stepsCount + 1).toString() + '.</span>';
         var newStep = '<textarea name="recipe[steps][' + stepsCount.toString() + ']" id="step' + stepsCount.toString() + '" required></textarea>';
-        document.getElementById('steps-container').innerHTML += newStepLabel
+        document.getElementById('steps-container').innerHTML += newStepLabel;
         document.getElementById('steps-container').innerHTML += newStep;
         stepsCount++;
     }
@@ -78,6 +86,14 @@
             e.removeChild(e.lastChild);
             stepsCount--;
         }
+    }
+
+    function addMyIngredient(ingredient)
+    {
+        event.preventDefault();
+        addIngredient();
+        document.getElementById("ingredient" + (ingredientsCount - 1).toString()).innerHTML += ingredient;
+        document.getElementById("myIng" + ingredient).remove();
     }
 
 </script>

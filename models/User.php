@@ -57,7 +57,7 @@
             if(mysqli_num_rows($result))
             {
                 $result = $result->fetch_assoc();
-                return new User($result['id'], $result['username'], $result['password']);
+                return new User($result['user_id'], $result['username'], $result['password']);
             }
             return null;
         }

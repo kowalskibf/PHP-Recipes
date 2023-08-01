@@ -23,6 +23,7 @@
             }
             else
             {
+                $myIngredients = Ingredient::getMyIngredients();
                 require 'views/recipe/create.php';
             }
         }
@@ -76,6 +77,29 @@
             $recipe = Recipe::getPublicRecipeById($recipeId);
             $favorite = Recipe::isRecipeFavorite($recipeId);
             require 'views/recipe/viewPublic.php';
+        }
+
+        public function viewMyIngredients()
+        {
+            if($_SERVER['REQUEST_METHOD'] === 'POST')
+            {
+                if(isset($_POST['id']))
+                {
+                    Ingredient::deleteIngredientById($_POST['id']);
+                }
+                else
+                {
+                    $ingredient = $_POST['ingredient'];
+                    Ingredient::insertSingleIngredient($ingredient);
+                    echo 'Dodano składnik do Twoich składników!';
+                }
+            }
+            $ingredients = Ingredient::getMyIngredients();
+            foreach($ingredients as $ingredient)
+            {
+                $useCount[spl_object_hash($ingredient)] = Ingredient::getIngredientUseCountById($ingredient->getId());
+            }
+            require 'views/recipe/myIngredients.php';
         }
     }
 

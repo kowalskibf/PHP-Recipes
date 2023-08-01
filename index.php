@@ -47,6 +47,9 @@
             case 'delete':
                 $recipeController->deleteRecipe();
                 break;
+            case 'myIngredients':
+                $recipeController->viewMyIngredients();
+                break;
             default:
                 $recipeController->getAllRecipes();
                 break;
